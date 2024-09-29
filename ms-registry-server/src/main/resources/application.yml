@@ -1,6 +1,6 @@
 spring:
   application:
-    name: ms-registry-server
+    name: ms-registry-service
   profiles:
     active: development
   config:

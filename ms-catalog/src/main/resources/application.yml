@@ -1,7 +1,7 @@
 
 spring:
   application:
-    name: ms-catálogo-service
+    name: ms-catálog-service
   profiles:
     active: development
   config:
