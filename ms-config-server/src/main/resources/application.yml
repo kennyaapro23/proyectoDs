@@ -8,7 +8,7 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/kennyaapro23/proyecto-ms.git # ruta del repositorio git
+          uri: https://github.com/kennyaapro23/proyectoDs.git # ruta del repositorio git
           searchPaths: config-data
           default-label: main
     security:
