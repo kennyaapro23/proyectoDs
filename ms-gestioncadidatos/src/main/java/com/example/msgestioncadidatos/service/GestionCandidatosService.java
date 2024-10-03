@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GestionCandidatosService {
-    public List<GestionCandidatos> listar();
-    public Optional<GestionCandidatos> listarPorId(Integer id);
-    public GestionCandidatos guardar(GestionCandidatos gestionCandidatos);
-    public GestionCandidatos actualizar(GestionCandidatos gestionCandidatos);
-    public void eliminar(Integer id);
+    public List<GestionCandidatos> list();
+    public Optional<GestionCandidatos> getById(Integer id);
+    public GestionCandidatos save(GestionCandidatos gestionCandidatos);
+    public GestionCandidatos update(GestionCandidatos gestionCandidatos);
+    public void delete(Integer id);
 }

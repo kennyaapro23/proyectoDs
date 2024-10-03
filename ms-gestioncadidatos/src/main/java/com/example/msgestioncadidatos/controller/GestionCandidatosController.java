@@ -19,23 +19,23 @@ public class GestionCandidatosController {
 
     @GetMapping()
     public ResponseEntity<List<GestionCandidatos>> list(){
-        return ResponseEntity.ok().body(gestionCandidatosService.listar());
+        return ResponseEntity.ok().body(gestionCandidatosService.list());
     }
     @GetMapping("/{id}")
     public ResponseEntity<GestionCandidatos> findById(@PathVariable(required = true) Integer id){
-        return ResponseEntity.ok().body(gestionCandidatosService.listarPorId(id).get());
+        return ResponseEntity.ok().body(gestionCandidatosService.getById(id).get());
     }
     @PostMapping()
     public ResponseEntity<GestionCandidatos> save(@RequestBody GestionCandidatos gestionCandidatos){
-        return ResponseEntity.ok().body(gestionCandidatosService.guardar(gestionCandidatos));
+        return ResponseEntity.ok().body(gestionCandidatosService.save(gestionCandidatos));
     }
     @PutMapping()
     public ResponseEntity<GestionCandidatos> update(@RequestBody GestionCandidatos gestionCandidatos){
-        return ResponseEntity.ok().body(gestionCandidatosService.actualizar(gestionCandidatos));
+        return ResponseEntity.ok().body(gestionCandidatosService.update(gestionCandidatos));
     }
     @DeleteMapping("/{id}")
     public String delete(@PathVariable(required = true) Integer id){
-        gestionCandidatosService.eliminar(id);
+        gestionCandidatosService.delete(id);
         return "eliminacion correcta";
     }
 }

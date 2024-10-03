@@ -1,9 +1,7 @@
 package com.example.msgestioncadidatos.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.msgestioncadidatos.dto.UserDto;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
@@ -21,5 +19,8 @@ public class GestionCandidatos {
     private String correoElectronico;
     private String direccion;
     private String fotoPerfil;
+    private Integer userid;
+    @Transient
+    private UserDto userDto;
 
 }
