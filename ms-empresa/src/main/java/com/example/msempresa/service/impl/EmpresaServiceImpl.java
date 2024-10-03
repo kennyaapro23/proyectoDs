@@ -1,6 +1,7 @@
 package com.example.msempresa.service.impl;
 
 import com.example.msempresa.entity.Empresa;
+import com.example.msempresa.feign.UserFeign;
 import com.example.msempresa.repository.EmpresaRepository;
 import com.example.msempresa.service.EmpresaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,9 @@ public class EmpresaServiceImpl implements EmpresaService {
     @Autowired
     private EmpresaRepository empresaRepository;
 
+    @Autowired
+    private UserFeign userFeign;
+
     @Override
     public List<Empresa> list() {
         return empresaRepository.findAll();
@@ -23,8 +27,11 @@ public class EmpresaServiceImpl implements EmpresaService {
 
     @Override
     public Optional<Empresa> getById(Integer id) {
-        return empresaRepository.findById(id);
+        Optional<Empresa> empresa = empresaRepository.findById(id);
+        empresa.get().setUserDto(userFeign.getById(empresa.get().getUserid()).getBody());
+        return empresa;
     }
+
 
     @Override
     public Empresa save(Empresa empresa) {
@@ -32,9 +39,9 @@ public class EmpresaServiceImpl implements EmpresaService {
     }
 
     @Override
-    public Empresa update(Integer id, Empresa user) {
-        user.setId(id);
-        return empresaRepository.save(user);
+    public Empresa update(Integer id, Empresa empresa) {
+        empresa.setId(id);
+        return empresaRepository.save(empresa);
     }
 
     @Override

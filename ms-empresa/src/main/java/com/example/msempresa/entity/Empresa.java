@@ -1,9 +1,7 @@
 package com.example.msempresa.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.msempresa.dto.UserDto;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
@@ -21,5 +19,11 @@ public class Empresa {
     private String rubro; // rubro en SQL
     private String creadoPor; // creado_por en SQL
     private String actualizadoPor; // actualizado_por en SQL
+    private Integer userid;
 
+    @Transient
+
+    private UserDto userDto;
 }
+
+
