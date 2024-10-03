@@ -10,9 +10,9 @@ public interface UserService {
 
     public Optional<User> getById(Integer id);
 
-    public User save(User category);
+    public User save(User user);
 
-    public User update(Integer id, User category);
+    public User update(Integer id, User user);
 
     public void delete(Integer id);
 }
