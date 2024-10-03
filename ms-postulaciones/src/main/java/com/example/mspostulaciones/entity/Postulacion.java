@@ -12,12 +12,9 @@ public class Postulacion {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String username;
-    private String password;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String phone;
-    private String role;
-    private String location;
+    private Integer usuarioId; // Relación con el usuario
+    private Integer trabajoId; // Relación con el trabajo
+    private String fechaPostulacion;
+    private String estado; // Ej. "Pendiente", "Aceptado", "Rechazado"
+    private String comentario; // Comentarios adicionales, si los hay
 }
