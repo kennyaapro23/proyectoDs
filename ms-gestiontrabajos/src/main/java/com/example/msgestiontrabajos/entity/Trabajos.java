@@ -12,14 +12,14 @@ public class Trabajos {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String nombreCompleto;
-    private String fechaNacimiento;
-    private String genero;
-    private String numeroDocumento;
-    private String nacionalidad;
-    private String telefono;
-    private String correoElectronico;
-    private String direccion;
-    private String fotoPerfil;
+    private String tituloTrabajo;
+    private String empresa;
+    private String fechaInicio;
+    private String fechaFin;
+    private String descripcion;
+    private String ubicacion;
+    private String tipoContrato;
+    private String salario;
+    private String responsable;
 
 }
