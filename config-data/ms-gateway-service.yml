@@ -19,10 +19,10 @@ spring:
         locator:
           enable: true
       routes:
-        - id: ms-user-service
-          uri: lb://ms-user-service
+        - id: ms-auth-service
+          uri: lb://ms-auth-service
           predicates:
-            - Path=/user/**
+            - Path=/auth/**
         - id: ms-client-service
           uri: lb://ms-client-service
           predicates:
