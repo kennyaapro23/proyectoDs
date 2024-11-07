@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Optional;
 
-@FeignClient(name = "ms-user-service", path = "/user")
+@FeignClient(name = "ms-auth-service", path = "/auth")
 public interface UserFeign {
 
     @GetMapping("/{id}")
