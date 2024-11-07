@@ -1,6 +1,7 @@
+
 spring:
   application:
-    name: ms-client-service
+    name: ms-postulacion-service
   profiles:
     active: development
   config:

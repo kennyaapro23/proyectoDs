@@ -17,4 +17,5 @@ public class Postulacion {
     private String fechaPostulacion;
     private String estado; // Ej. "Pendiente", "Aceptado", "Rechazado"
     private String comentario; // Comentarios adicionales, si los hay
+
 }
