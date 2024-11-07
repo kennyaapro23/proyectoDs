@@ -1,9 +1,8 @@
 package com.example.msempresa.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.msempresa.dto.GestiontrabajosDto;
+
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
@@ -12,7 +11,6 @@ public class Empresa {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     private String nombreEmpresa; // nombre_empresa en SQL
     private String telefono; // telefono en SQL
     private String direccion; // direccion en SQL
@@ -21,5 +19,10 @@ public class Empresa {
     private String rubro; // rubro en SQL
     private String creadoPor; // creado_por en SQL
     private String actualizadoPor; // actualizado_por en SQL
+    private Integer gestiontrabajosid;
+
+    @Transient
+    private GestiontrabajosDto gestiontrabajosDto;
+
 
 }

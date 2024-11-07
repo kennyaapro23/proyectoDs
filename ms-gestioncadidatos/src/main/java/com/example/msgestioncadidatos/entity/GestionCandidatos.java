@@ -1,6 +1,6 @@
 package com.example.msgestioncadidatos.entity;
 
-import com.example.msgestioncadidatos.dto.UserDto;
+import com.example.msgestioncadidatos.dto.PostulacionDto;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -19,8 +19,8 @@ public class GestionCandidatos {
     private String correoElectronico;
     private String direccion;
     private String fotoPerfil;
-    private Integer userid;
+    private Integer postulacionid;
     @Transient
-    private UserDto userDto;
+    private PostulacionDto postulacionDto;
 
 }

@@ -1,9 +1,9 @@
 package com.example.msgestioncadidatos.service.serviceimpl;
 
 
-import com.example.msgestioncadidatos.dto.UserDto;
+import com.example.msgestioncadidatos.dto.PostulacionDto;
 import com.example.msgestioncadidatos.entity.GestionCandidatos;
-import com.example.msgestioncadidatos.feign.UserFeign;
+import com.example.msgestioncadidatos.feign.PostulacionFeign;
 import com.example.msgestioncadidatos.repository.GestionCandidatosRepository;
 import com.example.msgestioncadidatos.service.GestionCandidatosService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class GestionCandidatosServiceImpl implements GestionCandidatosService {
     @Autowired
     private GestionCandidatosRepository gestionCandidatosRepository;
     @Autowired
-    private UserFeign userFeign;
+    private PostulacionFeign postulacionFeign;
 
     @Override
     public List<GestionCandidatos> list() {
@@ -29,15 +29,15 @@ public class GestionCandidatosServiceImpl implements GestionCandidatosService {
         // Para cada gestionCandidatos, obtener el UserDto asociado
         for (GestionCandidatos gestionCandidatos : gestionCandidatos1) {
             // Verifica que el userid no sea nulo
-            if (gestionCandidatos.getUserid() != null) {
-                Optional<UserDto> userDtoOptional = userFeign.getById(gestionCandidatos.getUserid()); // Llamada directa
+            if (gestionCandidatos.getPostulacionid() != null) {
+                Optional<PostulacionDto> postulacionDtoOptional = postulacionFeign.getById(gestionCandidatos.getPostulacionid()); // Llamada directa
 
                 // Verifica si el UserDto está presente
-                if (userDtoOptional.isPresent()) {
-                    gestionCandidatos.setUserDto(userDtoOptional.get()); // Usa el setter para establecer UserDto
+                if (postulacionDtoOptional.isPresent()) {
+                    gestionCandidatos.setPostulacionDto(postulacionDtoOptional.get()); // Usa el setter para establecer UserDto
                 } else {
-                    System.out.println("Usuario no encontrado para el id: " + gestionCandidatos.getUserid());
-                    gestionCandidatos.setUserDto(null); // O asignar un objeto vacío si prefieres
+                    System.out.println("Usuario no encontrado para el id: " + gestionCandidatos.getPostulacionid());
+                    gestionCandidatos.setPostulacionDto(null); // O asignar un objeto vacío si prefieres
                 }
             } else {
                 System.out.println("userid es nulo para la gestionCandidatos con id: " + gestionCandidatos.getId());
