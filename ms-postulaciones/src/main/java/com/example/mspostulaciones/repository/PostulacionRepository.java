@@ -2,11 +2,10 @@ package com.example.mspostulaciones.repository;
 
 
 import com.example.mspostulaciones.entity.Postulacion;
+import feign.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
+import org.springframework.data.jpa.repository.Query;
 
 public interface PostulacionRepository extends JpaRepository<Postulacion, Integer> {
-    List<Postulacion> findByUsuarioId(Integer usuarioId);
-    List<Postulacion> findByTrabajoId(Integer trabajoId);
+    long countByTrabajoId(Integer trabajoId);
 }

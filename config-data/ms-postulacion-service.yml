@@ -1,6 +1,6 @@
 server:
   #port: 8081
-  port: ${PORT:${SERVER_PORT:0}}
+  port: 8085
 spring:
   application:
     name: ms-postulacion-service

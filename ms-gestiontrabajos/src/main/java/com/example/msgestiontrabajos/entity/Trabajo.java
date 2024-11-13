@@ -35,4 +35,6 @@ public class Trabajo {
 
     @Column(name = "fecha_publicacion")
     private String fechaPublicacion;
+
+
 }
