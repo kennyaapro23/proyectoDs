@@ -23,10 +23,6 @@ spring:
           uri: lb://ms-auth-service
           predicates:
             - Path=/auth/**
-        - id: ms-client-service
-          uri: lb://ms-client-service
-          predicates:
-              - Path=/Client/**
         - id: ms-gestioncandidatos-service
           uri: lb://ms-gestioncandidatos-service
           predicates:
@@ -40,3 +36,7 @@ spring:
           uri: lb://ms-empresa-service
           predicates:
             - Path=/empresa/**
+        - id: ms-gestiontrabajos-service
+          uri: lb://ms-trabajos-service
+          predicates:
+            - Path=/trabajos/**
