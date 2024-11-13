@@ -5,9 +5,11 @@ import com.example.msempresa.entity.Empresa;
 import com.example.msempresa.feign.GestiontrabajosFeign;
 import com.example.msempresa.repository.EmpresaRepository;
 import com.example.msempresa.service.EmpresaService;
+import com.example.msempresa.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import jakarta.mail.MessagingException;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,8 +19,12 @@ public class EmpresaServiceImpl implements EmpresaService {
 
     @Autowired
     private EmpresaRepository empresaRepository;
+
     @Autowired
     private GestiontrabajosFeign gestiontrabajosFeign;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public List<Empresa> list() {
@@ -57,7 +63,24 @@ public class EmpresaServiceImpl implements EmpresaService {
 
     @Override
     public Empresa save(Empresa empresa) {
-        return empresaRepository.save(empresa);
+        Empresa savedEmpresa = empresaRepository.save(empresa);
+
+
+
+        // Enviar un correo al crear una nueva empresa
+        try {
+            if (savedEmpresa.getCorreo() != null && !savedEmpresa.getCorreo().isEmpty()) {
+                emailService.sendEmail(
+                        savedEmpresa.getCorreo(),
+                        "Nueva Empresa Registrada",
+                        "<h1>Bienvenido</h1><p>Gracias por registrar tu empresa en nuestra plataforma.</p>"
+                );
+            }
+        } catch (MessagingException e) {
+            System.out.println("Error al enviar correo a " + savedEmpresa.getCorreo() + ": " + e.getMessage());
+        }
+
+        return savedEmpresa;
     }
 
     @Override
