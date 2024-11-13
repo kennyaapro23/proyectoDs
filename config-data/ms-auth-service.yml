@@ -1,6 +1,6 @@
 server:
 
-  port: 8081
+  port: ${PORT:${SERVER_PORT:0}}
 
 spring:
   jpa:
