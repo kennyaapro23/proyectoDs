@@ -36,6 +36,8 @@ spring:
           predicates:
             - Path=/empresa/**
         - id: ms-gestiontrabajos-service
-          uri: lb://ms-trabajos-service
+          uri: lb://ms-gestiontrabajos-service
           predicates:
             - Path=/trabajos/**
+
+        
