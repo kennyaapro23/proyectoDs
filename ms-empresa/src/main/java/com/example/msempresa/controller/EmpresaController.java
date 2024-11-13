@@ -29,9 +29,20 @@ public class EmpresaController {
     }
 
     @PostMapping
-    public ResponseEntity<Empresa> save(@RequestBody Empresa empresa) {
-        return ResponseEntity.ok(empresaService.save(empresa));
+    public ResponseEntity<?> save(@RequestBody Empresa empresa) {
+        try {
+            // Guardar la empresa en la base de datos
+            Empresa savedEmpresa = empresaService.save(empresa);
+
+            // Enviar un correo al crear una nueva empresa (dentro de tu `EmpresaService`)
+            return ResponseEntity.status(201).body(savedEmpresa);
+        } catch (Exception e) {
+            // Manejar cualquier excepción que ocurra durante el guardado o envío del correo
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error al guardar la empresa o al enviar el correo: " + e.getMessage());
+        }
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<Empresa> update(@PathVariable(required = true) Integer id, @RequestBody Empresa empresa) {
