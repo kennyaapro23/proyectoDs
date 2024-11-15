@@ -17,43 +17,43 @@ import java.util.Optional;
 @Service
 public class EmpresaServiceImpl implements EmpresaService {
 
-    @Autowired
-    private EmpresaRepository empresaRepository;
+    private final GestiontrabajosFeign trabajosFeign;
+    private final EmpresaRepository empresaRepository;
+    private final EmailService emailService;
 
     @Autowired
-    private GestiontrabajosFeign gestiontrabajosFeign;
+    public EmpresaServiceImpl(GestiontrabajosFeign trabajosFeign,
+                              EmpresaRepository empresaRepository,
+                              EmailService emailService) {
+        this.trabajosFeign = trabajosFeign;
+        this.empresaRepository = empresaRepository;
+        this.emailService = emailService;
+    }
 
-    @Autowired
-    private EmailService emailService;
+    @Override
+    public GestiontrabajosDto publicarTrabajoDesdeEmpresa(GestiontrabajosDto trabajoDto, Integer empresaId) {
+        try {
+            // Ahora que el campo existe, esto debería funcionar sin problemas
+            trabajoDto.setEmpresaId(empresaId);
+
+            ResponseEntity<GestiontrabajosDto> response = trabajosFeign.publicarTrabajo(trabajoDto);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return response.getBody();
+            } else {
+                System.out.println("Error al publicar trabajo: " + response.getStatusCode());
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("Error al comunicar con el servicio de trabajos: " + e.getMessage());
+            return null;
+        }
+    }
+
 
     @Override
     public List<Empresa> list() {
-        List<Empresa> empresas = empresaRepository.findAll();
-
-        // Para cada empresa, obtener el GestiontrabajosDto asociado
-        for (Empresa empresa : empresas) {
-            if (empresa.getGestiontrabajosid() != null) {
-                try {
-                    // Llamada al Feign Client para obtener el trabajo
-                    ResponseEntity<GestiontrabajosDto> response = gestiontrabajosFeign.getById(empresa.getGestiontrabajosid());
-
-                    // Verificar si la respuesta es exitosa (HTTP 200 OK)
-                    if (response.getStatusCode().is2xxSuccessful()) {
-                        empresa.setGestiontrabajosDto(response.getBody());
-                    } else {
-                        System.out.println("No se encontró el trabajo para el id: " + empresa.getGestiontrabajosid());
-                        empresa.setGestiontrabajosDto(null);
-                    }
-                } catch (Exception e) {
-                    System.out.println("Error al obtener el trabajo para el id: " + empresa.getGestiontrabajosid() + " - " + e.getMessage());
-                    empresa.setGestiontrabajosDto(null);
-                }
-            } else {
-                System.out.println("El campo gestiontrabajosid es nulo para la empresa con id: " + empresa.getId());
-            }
-        }
-
-        return empresas;
+        return empresaRepository.findAll();
     }
 
     @Override
@@ -65,19 +65,17 @@ public class EmpresaServiceImpl implements EmpresaService {
     public Empresa save(Empresa empresa) {
         Empresa savedEmpresa = empresaRepository.save(empresa);
 
-
-
         // Enviar un correo al crear una nueva empresa
-        try {
-            if (savedEmpresa.getCorreo() != null && !savedEmpresa.getCorreo().isEmpty()) {
+        if (savedEmpresa.getCorreo() != null && !savedEmpresa.getCorreo().isEmpty()) {
+            try {
                 emailService.sendEmail(
                         savedEmpresa.getCorreo(),
                         "Nueva Empresa Registrada",
                         "<h1>Bienvenido</h1><p>Gracias por registrar tu empresa en nuestra plataforma.</p>"
                 );
+            } catch (MessagingException e) {
+                System.err.println("Error al enviar correo a " + savedEmpresa.getCorreo() + ": " + e.getMessage());
             }
-        } catch (MessagingException e) {
-            System.out.println("Error al enviar correo a " + savedEmpresa.getCorreo() + ": " + e.getMessage());
         }
 
         return savedEmpresa;

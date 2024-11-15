@@ -14,5 +14,5 @@ public class GestiontrabajosDto {
     private String tipoContrato;
     private String salario;
     private String responsable;
+    private Integer empresaId; // Nuevo campo añadido
 }
-

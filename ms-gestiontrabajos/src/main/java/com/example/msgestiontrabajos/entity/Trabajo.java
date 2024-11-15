@@ -1,9 +1,12 @@
 package com.example.msgestiontrabajos.entity;
 
+import com.example.msgestiontrabajos.dto.EmpresaDto;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -33,8 +36,25 @@ public class Trabajo {
     @Column(name = "salario")
     private String salario;
 
-    @Column(name = "fecha_publicacion")
-    private String fechaPublicacion;
+    @Column(name = "fecha_publicacion", nullable = false, updatable = false)
+    private LocalDateTime fechaPublicacion;
 
+    @Column(name = "fecha_inicio")
+    private LocalDateTime fechaInicio; // Fecha y hora de inicio de disponibilidad de la oferta laboral
 
+    @Column(name = "fecha_fin")
+    private LocalDateTime fechaFin; // Fecha y hora de fin de disponibilidad de la oferta laboral
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", nullable = false)
+    private Estado estado; // Estado de la oferta: ACTIVO o INACTIVO
+
+    // Campo Transient que no se guarda en la base de datos, utilizado para transferir datos de Empresa
+    @Transient
+    private EmpresaDto empresaDto;
+
+    public enum Estado {
+        ACTIVO,
+        INACTIVO
+    }
 }
