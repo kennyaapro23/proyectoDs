@@ -2,6 +2,7 @@ package com.example.msgestiontrabajos.service.serviceimpl;
 
 import com.example.msgestiontrabajos.dto.EmpresaDto;
 import com.example.msgestiontrabajos.entity.Trabajo;
+import com.example.msgestiontrabajos.entity.Trabajo.Estado;
 import com.example.msgestiontrabajos.feign.TrabajoFeign;
 import com.example.msgestiontrabajos.repository.TrabajoRepository;
 import com.example.msgestiontrabajos.service.EmailService;
@@ -12,6 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +35,7 @@ public class TrabajoServiceImpl implements TrabajoService {
         return trabajoRepository.findByEstado(Trabajo.Estado.ACTIVO);
     }
 
+
     @Override
     public Optional<Trabajo> getById(Integer id) {
         return trabajoRepository.findById(id);
@@ -42,7 +45,44 @@ public class TrabajoServiceImpl implements TrabajoService {
     public Trabajo save(Trabajo trabajo) {
         trabajo.setFechaPublicacion(LocalDateTime.now()); // Asignar la fecha y hora actuales a la fecha de publicación
         trabajo.setEstado(Trabajo.Estado.ACTIVO); // Establecer el estado inicial como ACTIVO
-        return trabajoRepository.save(trabajo);
+
+        Trabajo savedTrabajo = trabajoRepository.save(trabajo);
+
+        // Obtener el correo de la empresa a través de Feign
+        String empresaEmail = obtenerCorreoDeEmpresa(trabajo.getEmpresaId());
+
+        // Configurar el asunto y el contenido del correo
+        String subject = "Nuevo trabajo creado: " + trabajo.getTitulo();
+        String logoUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQC0WesYBUwIPE8kXYf42rQRFH3FkvLIGIzRQ&s";
+        String text = "<html>" +
+                "<body style='font-family: Arial, sans-serif;'>" +
+                "<div style='text-align: center; margin-bottom: 20px;'>" +
+                "<img src='" + logoUrl + "' alt='Logo de la Empresa' style='width: 100px; height: auto;'/>" +
+                "</div>" +
+                "<h2 style='color: #2e6da4;'>Estimado Cliente,</h2>" +
+                "<p>Nos complace informarle que se ha creado un nuevo trabajo titulado <strong>'" + trabajo.getTitulo() + "'</strong> asociado a su empresa.</p>" +
+                "<p><strong>Detalles del trabajo:</strong></p>" +
+                "<ul>" +
+                "<li><strong>Descripción:</strong> " + trabajo.getDescripcion() + "</li>" +
+                "<li><strong>Ubicación:</strong> " + trabajo.getUbicacion() + "</li>" +
+                "<li><strong>Tipo de Contrato:</strong> " + trabajo.getTipoContrato() + "</li>" +
+                "<li><strong>Salario:</strong> " + trabajo.getSalario() + "</li>" +
+                "<li><strong>Fecha de Publicación:</strong> " + trabajo.getFechaPublicacion() + "</li>" +
+                "</ul>" +
+                "<p>Si tiene alguna pregunta o necesita más información, no dude en ponerse en contacto con nosotros.</p>" +
+                "<p>Saludos cordiales,</p>" +
+                "<p style='color: #2e6da4;'><strong>Su equipo de gestión de trabajos</strong></p>" +
+                "</body>" +
+                "</html>";
+
+        try {
+            emailService.sendEmail(empresaEmail, subject, text);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error al enviar el correo a " + empresaEmail + ": " + e.getMessage());
+        }
+
+        return savedTrabajo;
     }
 
     @Override
@@ -78,11 +118,6 @@ public class TrabajoServiceImpl implements TrabajoService {
         }
     }
 
-    /**
-     * Método para obtener el correo de la empresa usando TrabajoFeign
-     * @param empresaId ID de la empresa
-     * @return Correo de la empresa o un correo predeterminado en caso de error
-     */
     private String obtenerCorreoDeEmpresa(Integer empresaId) {
         ResponseEntity<EmpresaDto> response = trabajoFeign.getById(empresaId);
 
@@ -94,6 +129,4 @@ public class TrabajoServiceImpl implements TrabajoService {
             return "correo@predeterminado.com"; // Valor predeterminado o lanza una excepción si prefieres
         }
     }
-
-
 }
