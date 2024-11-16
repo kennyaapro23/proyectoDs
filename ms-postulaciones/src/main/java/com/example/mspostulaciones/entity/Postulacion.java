@@ -15,18 +15,18 @@ public class Postulacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "usuario_id")
-    private Integer usuarioId; // Relación con el candidato
+    @Column(name = "candidatos_id")
+    private Integer candidatosId;
 
     @Column(name = "trabajo_id")
-    private Integer trabajoId; // Relación con el trabajo
+    private Integer trabajoId;
 
     @Column(name = "fecha_postulacion")
     private String fechaPostulacion;
 
     @Column(name = "estado")
-    private String estado; // Valores posibles: "Pendiente", "Aceptado", "Rechazado"
+    private String estado;
 
     @Column(name = "comentario", length = 500)
-    private String comentario; // Comentarios adicionales del candidato o de la empresa
+    private String comentario;
 }

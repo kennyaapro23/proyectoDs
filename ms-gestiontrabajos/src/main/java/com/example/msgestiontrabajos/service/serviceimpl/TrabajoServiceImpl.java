@@ -2,7 +2,8 @@ package com.example.msgestiontrabajos.service.serviceimpl;
 
 import com.example.msgestiontrabajos.dto.EmpresaDto;
 import com.example.msgestiontrabajos.entity.Trabajo;
-import com.example.msgestiontrabajos.entity.Trabajo.Estado;
+import com.example.msgestiontrabajos.dto.TrabajoDto;
+
 import com.example.msgestiontrabajos.feign.TrabajoFeign;
 import com.example.msgestiontrabajos.repository.TrabajoRepository;
 import com.example.msgestiontrabajos.service.EmailService;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,12 +45,24 @@ public class TrabajoServiceImpl implements TrabajoService {
 
     @Override
     public Trabajo save(Trabajo trabajo) {
-        trabajo.setFechaPublicacion(LocalDateTime.now()); // Asignar la fecha y hora actuales a la fecha de publicación
-        trabajo.setEstado(Trabajo.Estado.ACTIVO); // Establecer el estado inicial como ACTIVO
+        // Asignar la fecha y estado por defecto al trabajo
+        trabajo.setFechaPublicacion(LocalDateTime.now());
+        trabajo.setEstado(Trabajo.Estado.ACTIVO);
 
+        // Guardar el trabajo en la base de datos
         Trabajo savedTrabajo = trabajoRepository.save(trabajo);
 
-        // Obtener el correo de la empresa a través de Feign
+        // Obtener los detalles de la empresa usando Feign
+        if (trabajo.getEmpresaId() != null) {
+            ResponseEntity<EmpresaDto> response = trabajoFeign.getById(trabajo.getEmpresaId());
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                EmpresaDto empresa = response.getBody();
+                savedTrabajo.setEmpresaDto(empresa); // Asignar los detalles de la empresa al trabajo
+            }
+        }
+
+        // Obtener el correo de la empresa para el envío de notificaciones
         String empresaEmail = obtenerCorreoDeEmpresa(trabajo.getEmpresaId());
 
         // Configurar el asunto y el contenido del correo
@@ -75,6 +89,7 @@ public class TrabajoServiceImpl implements TrabajoService {
                 "</body>" +
                 "</html>";
 
+        // Enviar el correo electrónico
         try {
             emailService.sendEmail(empresaEmail, subject, text);
         } catch (Exception e) {
@@ -84,6 +99,7 @@ public class TrabajoServiceImpl implements TrabajoService {
 
         return savedTrabajo;
     }
+
 
     @Override
     public Trabajo update(Trabajo trabajo) {
@@ -127,6 +143,42 @@ public class TrabajoServiceImpl implements TrabajoService {
         } else {
             System.err.println("Error al obtener el correo de la empresa con ID: " + empresaId);
             return "correo@predeterminado.com"; // Valor predeterminado o lanza una excepción si prefieres
+        }
+    }
+
+
+    @Override
+    public TrabajoDto obtenerTrabajoConEmpresa(Integer id) {
+        // Buscar el trabajo por ID
+        Optional<Trabajo> optionalTrabajo = trabajoRepository.findById(id);
+
+        if (optionalTrabajo.isPresent()) {
+            Trabajo trabajo = optionalTrabajo.get();
+
+            // Usar Feign para obtener los detalles de la empresa
+            ResponseEntity<EmpresaDto> response = trabajoFeign.getById(trabajo.getEmpresaId());
+
+            // Crear el DTO de respuesta
+            TrabajoDto trabajoDto = new TrabajoDto();
+            trabajoDto.setId(trabajo.getId());
+            trabajoDto.setTitulo(trabajo.getTitulo());
+            trabajoDto.setDescripcion(trabajo.getDescripcion());
+            trabajoDto.setUbicacion(trabajo.getUbicacion());
+            trabajoDto.setTipoContrato(trabajo.getTipoContrato());
+            trabajoDto.setSalario(trabajo.getSalario());
+            trabajoDto.setFechaPublicacion(trabajo.getFechaPublicacion());
+            trabajoDto.setFechaInicio(trabajo.getFechaInicio());
+            trabajoDto.setFechaFin(trabajo.getFechaFin());
+            trabajoDto.setEstado(trabajo.getEstado());
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                EmpresaDto empresa = response.getBody();
+                trabajoDto.setEmpresaNombre(empresa.getNombreEmpresa());
+                trabajoDto.setEmpresaCorreo(empresa.getCorreo());
+            }
+            return trabajoDto;
+        } else {
+            throw new RuntimeException("Trabajo no encontrado con el ID: " + id);
         }
     }
 }

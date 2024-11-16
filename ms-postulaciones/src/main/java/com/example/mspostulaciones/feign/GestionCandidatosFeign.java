@@ -8,5 +8,5 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "ms-gestioncandidatos-service", path = "/gestioncandidatos")
 public interface GestionCandidatosFeign {
     @GetMapping("/{id}")
-    CandidatoDto obtenerCandidatoPorId(@PathVariable Integer id);
+    CandidatoDto obtenerCandidatoPorId(@PathVariable("id") Integer id);
 }

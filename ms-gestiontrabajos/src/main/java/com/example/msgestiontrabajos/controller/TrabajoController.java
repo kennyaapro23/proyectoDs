@@ -1,5 +1,6 @@
 package com.example.msgestiontrabajos.controller;
 
+import com.example.msgestiontrabajos.dto.TrabajoDto;  // Importar TrabajoDto
 import com.example.msgestiontrabajos.entity.Trabajo;
 import com.example.msgestiontrabajos.service.TrabajoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/trabajos")
@@ -24,8 +24,9 @@ public class TrabajoController {
 
     // Obtener un trabajo específico por ID
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Trabajo>> obtenerPorId(@PathVariable Integer id) {
-        return ResponseEntity.ok(trabajoService.getById(id));
+    public ResponseEntity<TrabajoDto> obtenerPorId(@PathVariable Integer id) {
+        TrabajoDto trabajoDto = trabajoService.obtenerTrabajoConEmpresa(id);
+        return ResponseEntity.ok(trabajoDto);
     }
 
     // Crear un nuevo trabajo para una empresa específica

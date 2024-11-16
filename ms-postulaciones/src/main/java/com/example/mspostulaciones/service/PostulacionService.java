@@ -1,5 +1,6 @@
 package com.example.mspostulaciones.service;
 
+import com.example.mspostulaciones.dto.CandidatoDto;
 import com.example.mspostulaciones.dto.PostulacionDto;
 import com.example.mspostulaciones.entity.Postulacion;
 
@@ -23,4 +24,6 @@ public interface PostulacionService {
 
     // Declaración del método que cuenta las postulaciones por trabajo
     long countByTrabajoId(Integer trabajoId);
+
+    List<CandidatoDto> listarPostulantesPorTrabajoId(Integer trabajoId);
 }
