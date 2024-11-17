@@ -1,6 +1,5 @@
 package com.example.msauth.controller;
 
-
 import com.example.msauth.dto.AuthUserDto;
 import com.example.msauth.entity.AuthUser;
 import com.example.msauth.entity.TokenDto;
@@ -11,31 +10,48 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "http://localhost:4200")
 public class AuthUserController {
-    @Autowired
-    AuthUserService authUserService;
 
+    private final AuthUserService authUserService;
+
+    // Inyección de dependencia por constructor
+    @Autowired
+    public AuthUserController(AuthUserService authUserService) {
+        this.authUserService = authUserService;
+    }
+
+    /**
+     * Endpoint para el inicio de sesión
+     */
     @PostMapping("/login")
     public ResponseEntity<TokenDto> login(@RequestBody AuthUserDto authUserDto) {
-        TokenDto tokenDto = authUserService.login(authUserDto);
-        if (tokenDto == null)
-            return ResponseEntity.badRequest().build();
-        return ResponseEntity.ok(tokenDto);
+        return handleResponse(authUserService.login(authUserDto));
     }
 
+    /**
+     * Endpoint para validar un token
+     */
     @PostMapping("/validate")
     public ResponseEntity<TokenDto> validate(@RequestParam String token) {
-        TokenDto tokenDto = authUserService.validate(token);
-        if (tokenDto == null)
-            return ResponseEntity.badRequest().build();
-        return ResponseEntity.ok(tokenDto);
+        return handleResponse(authUserService.validate(token));
     }
 
+    /**
+     * Endpoint para crear un nuevo usuario
+     */
     @PostMapping("/create")
     public ResponseEntity<AuthUser> create(@RequestBody AuthUserDto authUserDto) {
-        AuthUser authUser = authUserService.save(authUserDto);
-        if (authUser == null)
+        return handleResponse(authUserService.save(authUserDto));
+    }
+
+    /**
+     * Método genérico para manejar las respuestas de los endpoints
+     */
+    private <T> ResponseEntity<T> handleResponse(T result) {
+        if (result == null) {
             return ResponseEntity.badRequest().build();
-        return ResponseEntity.ok(authUser);
+        }
+        return ResponseEntity.ok(result);
     }
 }
