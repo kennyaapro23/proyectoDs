@@ -6,11 +6,18 @@ spring:
   config:
     import: optional:configserver:http://root:123456@localhost:7070
 
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+
   mail:
     host: smtp.gmail.com
     port: 587
     username: bolsalaboralolef@gmail.com
-    password: "bhprwaebvbtfobmm"
+    password: bhprwaebvbtfobmm  # Asegúrate de que las comillas dobles no sean necesarias
     properties:
       mail:
         smtp:

@@ -55,4 +55,6 @@ public class TrabajoController {
     public ResponseEntity<List<Trabajo>> obtenerActivosPorEmpresa(@PathVariable Integer empresaId) {
         return ResponseEntity.ok(trabajoService.findByEmpresaId(empresaId));
     }
+
+
 }

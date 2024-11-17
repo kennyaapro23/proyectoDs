@@ -8,7 +8,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 @Service
-
 public class EmailService {
 
     @Autowired
@@ -17,11 +16,12 @@ public class EmailService {
     public void sendEmail(String toEmail, String subject, String body) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
+            helper.setFrom("bolsalaboralolef@gmail.com");
             helper.setTo(toEmail);
             helper.setSubject(subject);
-            helper.setText(body, true); // Indicando que el cuerpo es HTML
+            helper.setText(body, true); // Para contenido HTML
 
             mailSender.send(message);
             System.out.println("Correo enviado exitosamente a: " + toEmail);
@@ -30,4 +30,3 @@ public class EmailService {
         }
     }
 }
-

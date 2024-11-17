@@ -1,15 +1,15 @@
 package com.example.msgestioncadidatos.controller;
 
 import com.example.msgestioncadidatos.entity.GestionCandidatos;
-
 import com.example.msgestioncadidatos.service.GestionCandidatosService;
+import jakarta.validation.Valid;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/gestioncandidatos")
@@ -22,26 +22,20 @@ public class GestionCandidatosController {
     @GetMapping
     public ResponseEntity<List<GestionCandidatos>> list() {
         List<GestionCandidatos> candidatos = gestionCandidatosService.list();
-        if (candidatos.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(candidatos);
+        return candidatos.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(candidatos);
     }
 
     // Obtener candidato por ID
     @GetMapping("/{id}")
     public ResponseEntity<GestionCandidatos> findById(@PathVariable Integer id) {
-        Optional<GestionCandidatos> candidato = gestionCandidatosService.getById(id);
-        if (candidato.isPresent()) {
-            return ResponseEntity.ok(candidato.get());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+        return gestionCandidatosService.getById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     // Crear un nuevo candidato
     @PostMapping
-    public ResponseEntity<GestionCandidatos> save(@RequestBody GestionCandidatos gestionCandidatos) {
+    public ResponseEntity<GestionCandidatos> save(@Valid @RequestBody GestionCandidatos gestionCandidatos) {
         try {
             GestionCandidatos nuevoCandidato = gestionCandidatosService.save(gestionCandidatos);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevoCandidato);
@@ -54,22 +48,60 @@ public class GestionCandidatosController {
     @PutMapping("/{id}")
     public ResponseEntity<GestionCandidatos> update(
             @PathVariable Integer id,
-            @RequestBody GestionCandidatos gestionCandidatos) {
-        if (!gestionCandidatosService.getById(id).isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        gestionCandidatos.setId(id);
-        GestionCandidatos actualizado = gestionCandidatosService.update(gestionCandidatos);
-        return ResponseEntity.ok(actualizado);
+            @Valid @RequestBody GestionCandidatos gestionCandidatos) {
+        return gestionCandidatosService.getById(id)
+                .map(existing -> {
+                    gestionCandidatos.setId(id);
+                    GestionCandidatos actualizado = gestionCandidatosService.update(gestionCandidatos);
+                    return ResponseEntity.ok(actualizado);
+                })
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     // Eliminar un candidato por ID
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable Integer id) {
-        if (!gestionCandidatosService.getById(id).isPresent()) {
+        if (gestionCandidatosService.getById(id).isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Candidato no encontrado");
         }
         gestionCandidatosService.delete(id);
         return ResponseEntity.ok("Eliminación correcta");
+    }
+
+    // Enviar código de verificación
+    @PostMapping("/enviar-codigo")
+    public ResponseEntity<String> enviarCodigo(@RequestParam String email) {
+        try {
+            gestionCandidatosService.enviarCodigoVerificacion(email);
+            return ResponseEntity.ok("Código enviado al correo.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al enviar el código.");
+        }
+    }
+
+    // Verificar código
+    @PostMapping("/verificar-codigo")
+    public ResponseEntity<String> verificarCodigo(
+            @RequestParam String email,
+            @RequestParam String codigo) {
+        try {
+            if (gestionCandidatosService.verificarCodigo(email, codigo)) {
+                return ResponseEntity.ok("Correo verificado exitosamente.");
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Código incorrecto.");
+        } catch (MessagingException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al enviar el correo de confirmación.");
+        }
+    }
+
+    // Reenviar código de verificación
+    @PostMapping("/reenviar-codigo")
+    public ResponseEntity<String> reenviarCodigo(@RequestParam String email) {
+        try {
+            gestionCandidatosService.reenviarCodigoVerificacion(email);
+            return ResponseEntity.ok("Nuevo código enviado al correo.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al reenviar el código.");
+        }
     }
 }
