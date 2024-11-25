@@ -8,9 +8,13 @@ import java.util.List;
 
 @Repository
 public interface TrabajoRepository extends JpaRepository<Trabajo, Integer> {
-    // Método para encontrar trabajos asociados a una empresa específica
+
+    // Buscar trabajos asociados a una empresa específica
     List<Trabajo> findByEmpresaId(Integer empresaId);
 
-    // Método para encontrar trabajos por estado (ACTIVO o INACTIVO)
+    // Buscar trabajos por estado (ACTIVO o INACTIVO)
     List<Trabajo> findByEstado(Trabajo.Estado estado);
+
+    // Buscar trabajos por empresa y estado
+    List<Trabajo> findByEmpresaIdAndEstado(Integer empresaId, Trabajo.Estado estado);
 }

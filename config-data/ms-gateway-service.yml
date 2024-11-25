@@ -35,11 +35,11 @@ spring:
         - id: ms-gestioncandidatos-service
           uri: lb://ms-gestioncandidatos-service
           predicates:
-                - Path=/gestioncandidatos/**
+            - Path=/gestioncandidatos/**
         - id: ms-postulacion-service
           uri: lb://ms-postulacion-service
           predicates:
-                - Path=/postulacion/**
+            - Path=/postulacion/**
         - id: ms-empresa-service
           uri: lb://ms-empresa-service
           predicates:
