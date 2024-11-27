@@ -6,9 +6,6 @@ spring:
   config:
     import: optional:configserver:http://root:123456@localhost:7070
 
-  file:
-    upload-dir: D:/BolsaLAboralImg
-
   mail:
       host: smtp.gmail.com
       port: 587

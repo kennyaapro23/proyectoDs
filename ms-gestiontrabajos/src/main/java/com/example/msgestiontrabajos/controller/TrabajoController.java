@@ -1,21 +1,18 @@
 package com.example.msgestiontrabajos.controller;
 
 import com.example.msgestiontrabajos.dto.EmpresaDto;
+import com.example.msgestiontrabajos.dto.response.CloudinaryResponse;
 import com.example.msgestiontrabajos.entity.Trabajo;
 import com.example.msgestiontrabajos.service.TrabajoService;
+import com.example.msgestiontrabajos.service.CloudinaryService; // Servicio de Cloudinary
+import com.example.msgestiontrabajos.util.FileUploadUtil; // Utilidad para validaciones
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import java.util.Optional; // Agregar esta importación
-
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/trabajos")
@@ -24,8 +21,8 @@ public class TrabajoController {
     @Autowired
     private TrabajoService trabajoService;
 
-    @Value("${spring.file.upload-dir}") // Ruta definida en application.yml
-    private String uploadDir;
+    @Autowired
+    private CloudinaryService cloudinaryService; // Inyectar servicio de Cloudinary
 
     // Listar solo trabajos en estado ACTIVO
     @GetMapping
@@ -79,41 +76,30 @@ public class TrabajoController {
 
     // Endpoint para subir una imagen asociada a un trabajo
     @PostMapping("/{id}/upload-image")
-    public ResponseEntity<String> subirImagen(@PathVariable Integer id, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Object> subirImagen(@PathVariable Integer id, @RequestParam("file") MultipartFile file) {
         try {
-            // Verificar si el archivo no está vacío
-            if (file.isEmpty()) {
-                return ResponseEntity.badRequest().body("El archivo está vacío.");
-            }
+            // Validar el archivo
+            FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
 
-            // Construir la ruta de destino
-            Path uploadPath = Paths.get(uploadDir);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath); // Crear el directorio si no existe
-            }
-
-            // Guardar el archivo
-            String filename = id + "_" + file.getOriginalFilename(); // Ejemplo: "1_logo.png"
-            Path filePath = uploadPath.resolve(filename);
-            Files.copy(file.getInputStream(), filePath);
-
-            // Devolver la ruta pública de la imagen
-            String publicUrl = "/uploads/" + filename;
+            // Subir la imagen a Cloudinary
+            String fileName = FileUploadUtil.getFileName(file.getOriginalFilename());
+            CloudinaryResponse response = cloudinaryService.uploadFile(file, fileName);
 
             // Obtener el trabajo desde el servicio
-            Optional<Trabajo> trabajoOpt = trabajoService.getById(id); // Cambié `trabajoService.findById(id)` por `trabajoService.getById(id)`
+            Optional<Trabajo> trabajoOpt = trabajoService.getById(id);
             if (trabajoOpt.isPresent()) {
                 Trabajo trabajo = trabajoOpt.get();
-                trabajo.setFototrabajo(publicUrl); // Establecer la ruta de la imagen
-                trabajoService.save(trabajo); // Guardar el trabajo con la ruta de la imagen actualizada
+                trabajo.setFototrabajo(response.getUrl()); // Guardar la URL en el campo `fototrabajo`
+                trabajoService.save(trabajo);
             } else {
                 return ResponseEntity.notFound().build(); // Si el trabajo no existe
             }
 
-            return ResponseEntity.ok("Imagen subida exitosamente: " + publicUrl);
+            return ResponseEntity.ok(response); // Devolver la respuesta completa de Cloudinary
+        } catch (FileUploadUtil.FileValidationException e) {
+            return ResponseEntity.badRequest().body("Error de validación: " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error al subir la imagen: " + e.getMessage());
         }
     }
-
 }
