@@ -18,10 +18,11 @@ public class Empresa {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    // Solo almacenamos el ID del usuario
+    // Relación con el usuario
     @Column(name = "usuario_id", nullable = false)
     private Integer usuarioId;
 
+    // Datos básicos de la empresa
     @NotBlank(message = "El nombre de la empresa no puede estar vacío")
     @Column(name = "nombre_empresa", nullable = false, length = 100)
     private String nombreEmpresa;
@@ -34,23 +35,23 @@ public class Empresa {
     @Column(name = "direccion", nullable = false, length = 200)
     private String direccion;
 
+    // Información adicional sobre la empresa
     @Column(name = "descripcion", length = 500)
     private String descripcion;
 
     @Column(name = "sitio_web", length = 200)
     private String sitioWeb;
 
+    // Información de contacto
     @Email(message = "El correo debe ser válido")
     @NotBlank(message = "El correo no puede estar vacío")
     @Column(name = "correo", nullable = false, length = 100)
     private String correo;
 
+    // Detalles adicionales sobre la industria
     @Column(name = "rubro", length = 100)
     private String rubro;
 
-
-    @Column(name = "gestiontrabajos_id")
-    private Integer gestiontrabajosId;
 
     // Campos transitorios para datos relacionados no almacenados en la base de datos
     @Transient
@@ -58,5 +59,6 @@ public class Empresa {
 
     @Transient
     private AuthUserDto authUserDto;
+
 
 }

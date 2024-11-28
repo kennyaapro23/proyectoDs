@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "ms-empresa-service", path="/empresa")
 public interface EmpresaFeign {
 
+
     @GetMapping("/{id}")
-    ResponseEntity<EmpresaDto> getById(@PathVariable("id") Integer id);
+    EmpresaDto obtenerEmpresaPorId(@PathVariable("id") Integer id);
 
 }
